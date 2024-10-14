@@ -1386,6 +1386,20 @@ Function TurnOffAllVibrators()
         endif
         i+=1
     endwhile
+    i = 0
+    while (i < UD_equipedCustomDevices.length) && UD_equipedCustomDevices[i]
+        UD_CustomVibratorBase_RenderScript loc_vib = (UD_equipedCustomDevices[i] as UD_CustomVibratorBase_RenderScript)
+        if loc_vib && !(loc_vib as UD_ControlablePlug_RenderScript)
+            ;do not stp vibrators which are turned or forever
+            if loc_vib.isVibrating() && !loc_vib.isVibratingForever()
+                if UDmain.TraceAllowed()
+                    UDmain.Log("Stoping " + UD_equipedCustomDevices[i].getDeviceName() + " on " + getSlotedNPCName())
+                endif
+                (UD_equipedCustomDevices[i] as UD_CustomVibratorBase_RenderScript).stopVibratingAndWait()
+            endif
+        endif
+        i+=1
+    endwhile
 EndFunction
 
 ;returns number of vibrators
