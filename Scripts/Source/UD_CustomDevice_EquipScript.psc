@@ -780,7 +780,37 @@ Event LockDevice(Actor akActor, Bool abUseMutex = True)
     if loc_haveHBkwd
         UDCDmain.UnequipInvisibleArmbinder(akActor)
     endif
+    ObjectReference invRef=akActor.DropObject(DeviceInventory,1)
+    Int InvUniqueId=nioverride.GetObjectUniqueID(invRef)
+    akActor.AddItem(invRef,1,True)
+    if !akActor.IsEquipped(DeviceInventory)
+        akActor.EquipItem(DeviceInventory, false, true)
+    EndIf    
     
+	
+	
+    
+	if (InvUniqueId!=0)
+        Int MaskIndex=0
+        Int MaxMaskIndex=Game.GetNumTintMasks()
+        int[] TintColors = new int[127]
+        nioverride.EnableTintTextureCache()
+        While (MaskIndex < MaxMaskIndex)
+            TintColors[MaskIndex]=nioverride.GetItemDyeColor(InvUniqueId,MaskIndex)
+            MaskIndex=MaskIndex+1
+        EndWhile
+        akActor.AddItem(DeviceRendered,1,True)
+        ObjectReference renderRef=akActor.DropObject(DeviceRendered,1)
+        Int RenderUniqueId=nioverride.GetObjectUniqueID(renderRef)
+        akActor.AddItem(renderRef,1,True)
+        While (MaskIndex < MaxMaskIndex)
+            if (RenderUniqueId!=0)
+                nioverride.SetItemDyeColor(RenderUniqueId,MaskIndex,TintColors[MaskIndex])
+            EndIf
+        EndWhile
+        nioverride.UpdateItemDyeColor(akActor,RenderUniqueId)
+        nioverride.ReleaseTintTextureCache()
+	EndIf
     akActor.EquipItem(DeviceRendered, true, true)
     
     if abUseMutex
